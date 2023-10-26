@@ -1,3 +1,5 @@
+% Izhikevich single neuron to show anode break excitation
+
 a=0.03; b=0.25; c=-60;  d=4;
 V=-64;  u=b*V;
 

@@ -1,3 +1,4 @@
+% Model using Neuron class
 clear;
 
 % time
@@ -20,7 +21,7 @@ n.feedback_var(1) = b*n.voltage(1);
 
 % input current
 input_current = zeros(1, length(tspan));
-input_current(T1:T1 + round(20/tau)) = -10;
+input_current(T1:T1 + round(20/tau)) = 10;
 
 for ti = 2:length(tspan)
     i = input_current(ti);

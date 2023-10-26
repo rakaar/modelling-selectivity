@@ -1,3 +1,4 @@
+% Single Izhikevich neuron class
 classdef Neuron
     
     properties
