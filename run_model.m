@@ -38,6 +38,30 @@ tau_synapse = 50;
 input_current = zeros(1, length(tspan));
 input_current(T1:T1 + round(30/tau)) = 10;
 
+
+% thalamus neurons
+thalamus_firing_rate = 5;
+thalamus_neurons = cell(2,1);
+thalamus_neurons{1,1} = Neuron;
+thalamus_neurons{1,1}.id = -1;
+thalamus_neurons{1,1}.spikes(51:100) = generate_poisson_spike(thalamus_firing_rate, 50, tau);
+[xe,~,~] = generate_xr_xe_xi_from_spike_train(thalamus_neurons{1,1}.spikes(51:100), tau);
+thalamus_neurons{1,1}.xe(51:100) = xe;
+figure
+plot(thalamus_neurons{1,1}.xe, 'LineWidth', 4)
+hold on
+plot(thalamus_neurons{1,1}.spikes)
+
+thalamus_neurons{2,1} = Neuron;
+thalamus_neurons{2,1}.id = -2;
+thalamus_neurons{2,1}.spikes(151:200) = generate_poisson_spike(thalamus_firing_rate, 50, tau);
+[xe,~,~] = generate_xr_xe_xi_from_spike_train(thalamus_neurons{2,1}.spikes(151:200), tau);
+thalamus_neurons{2,1}.xe(151:200) = xe;
+figure
+plot(thalamus_neurons{2,1}.xe, 'LineWidth', 4)
+hold on
+plot(thalamus_neurons{2,1}.spikes)
+
 for ti = 2:length(tspan)
     
 

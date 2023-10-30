@@ -11,6 +11,7 @@ classdef Neuron
         xe
         xr
         xi
+        psc
     end
 
     methods
