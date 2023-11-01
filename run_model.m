@@ -1,5 +1,5 @@
 % Model using Neuron class
-clear;
+clear;close all;
 
 % time
 tau = 0.2;  tspan = 0:tau:50;
@@ -46,41 +46,59 @@ thalamus_neurons{1,1} = Neuron;
 thalamus_neurons{1,1}.id = -1;
 thalamus_neurons{1,1}.spikes(51:100) = generate_poisson_spike(thalamus_firing_rate, 50, tau);
 [xe,~,~] = generate_xr_xe_xi_from_spike_train(thalamus_neurons{1,1}.spikes(51:100), tau);
+thalamus_neurons{1,1}.xe = zeros(1, length(tspan));
 thalamus_neurons{1,1}.xe(51:100) = xe;
-figure
-plot(thalamus_neurons{1,1}.xe, 'LineWidth', 4)
-hold on
-plot(thalamus_neurons{1,1}.spikes)
+
 
 thalamus_neurons{2,1} = Neuron;
 thalamus_neurons{2,1}.id = -2;
 thalamus_neurons{2,1}.spikes(151:200) = generate_poisson_spike(thalamus_firing_rate, 50, tau);
 [xe,~,~] = generate_xr_xe_xi_from_spike_train(thalamus_neurons{2,1}.spikes(151:200), tau);
+thalamus_neurons{2,1}.xe = zeros(1, length(tspan));
 thalamus_neurons{2,1}.xe(151:200) = xe;
-figure
-plot(thalamus_neurons{2,1}.xe, 'LineWidth', 4)
-hold on
-plot(thalamus_neurons{2,1}.spikes)
 
+
+inhibitory_neuron = Neuron;
+inhibitory_neuron.id = 0;
+inhibitory_neuron.voltage = zeros(1, length(tspan));
+inhibitory_neuron.spikes = zeros(1, length(tspan));
+inhibitory_neuron.feedback_var = zeros(1, length(tspan));
+inhibitory_neuron.voltage(1) = -64;
+inhibitory_neuron.feedback_var(1) = b*inhibitory_neuron.voltage(1);
+inhibitory_neuron.xr = zeros(1, length(tspan));
+inhibitory_neuron.xe = zeros(1, length(tspan));
+inhibitory_neuron.xi = zeros(1, length(tspan));
+inhibitory_neuron.xr(1) = 1;
+
+
+q = [];
 for ti = 2:length(tspan)
-    
+    % inhibitory neuron
+    i = 20*thalamus_neurons{1,1}.xe(ti) + 20*thalamus_neurons{2,1}.xe(ti);
+    q = [q i];
+    v_t_minus_1 = inhibitory_neuron.voltage(ti-1);
+    u_t_minus_1 = inhibitory_neuron.feedback_var(ti-1);
+    inhibitory_neuron = inhibitory_neuron.update_vars(v_t_minus_1, u_t_minus_1, i, ti, tau);
 
+    % exc neuron
     for n = 1:2
         if n == 1
-            i = input_current(ti);
+            i = 10*thalamus_neurons{1,1}.xe(ti) + -10*inhibitory_neuron.xe(ti);
 
             v_t_minus_1 = neuron_arr{n,1}.voltage(ti-1);
             u_t_minus_1 = neuron_arr{n,1}.feedback_var(ti-1);
     
             neuron_arr{n,1} = neuron_arr{n,1}.update_vars(v_t_minus_1, u_t_minus_1, i, ti, tau);
         else
-            i = synaptic_weights(1,2)*5*neuron_arr{1,1}.xe(ti);
+            i = 2*synaptic_weights(1,2)*neuron_arr{1,1}.xe(ti) + 10*thalamus_neurons{2,1}.xe(ti) + -1*inhibitory_neuron.xe(ti);
             v_t_minus_1 = neuron_arr{n,1}.voltage(ti-1);
             u_t_minus_1 = neuron_arr{n,1}.feedback_var(ti-1);
     
             neuron_arr{n,1} = neuron_arr{n,1}.update_vars(v_t_minus_1, u_t_minus_1, i, ti, tau);
         end
     end
+
+  
 
     % update synaptic weights
     pre_syn_activity = sum(neuron_arr{1,1}.spikes(max(1,ti-50):ti-1));
@@ -89,5 +107,9 @@ for ti = 2:length(tspan)
     
 end
 
+figure
+    plot(neuron_arr{1,1}.spikes)
+figure
+    plot(neuron_arr{1,1}.input_current)
 
 
