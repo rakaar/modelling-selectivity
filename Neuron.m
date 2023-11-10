@@ -15,13 +15,12 @@ classdef Neuron
     end
 
     methods
-        function obj = update_vars(obj, v_t_minus_1, u_t_minus_1, i, ti, tau)
+        function obj = update_vars(obj, v_t_minus_1, u_t_minus_1, i, ti, tau, tau_re, tau_ei, tau_ir)
 
             obj.input_current(ti) = i;
             
-            a=0.03; b=0.25; c=-60;  d=4; tau = 0.2;
-            tau_re = 0.9; tau_ei = 5.3; tau_ir = 800;
-
+            a=0.03; b=0.25; c=-60;  d=4;
+           
 
             v_t  = v_t_minus_1 + tau*(0.04*v_t_minus_1^2 + 5*v_t_minus_1 + 140 - u_t_minus_1 + i);
             u_t = u_t_minus_1  + tau*a*(b*v_t - u_t_minus_1);

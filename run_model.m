@@ -70,6 +70,8 @@ inhibitory_neuron.xe = zeros(1, length(tspan));
 inhibitory_neuron.xi = zeros(1, length(tspan));
 inhibitory_neuron.xr(1) = 1;
 
+tau_re = 0.9; tau_ei = 5.3; tau_ir = 800;
+inh_tau_re = 0.9; inh_tau_ei = 5.3; inh_tau_ir = 800;
 
 q = [];
 for ti = 2:length(tspan)
@@ -78,7 +80,7 @@ for ti = 2:length(tspan)
     q = [q i];
     v_t_minus_1 = inhibitory_neuron.voltage(ti-1);
     u_t_minus_1 = inhibitory_neuron.feedback_var(ti-1);
-    inhibitory_neuron = inhibitory_neuron.update_vars(v_t_minus_1, u_t_minus_1, i, ti, tau);
+    inhibitory_neuron = inhibitory_neuron.update_vars(v_t_minus_1, u_t_minus_1, i, ti, tau, inh_tau_re, inh_tau_ei, inh_tau_ir);
 
     % exc neuron
     for n = 1:2
@@ -88,13 +90,13 @@ for ti = 2:length(tspan)
             v_t_minus_1 = neuron_arr{n,1}.voltage(ti-1);
             u_t_minus_1 = neuron_arr{n,1}.feedback_var(ti-1);
     
-            neuron_arr{n,1} = neuron_arr{n,1}.update_vars(v_t_minus_1, u_t_minus_1, i, ti, tau);
+            neuron_arr{n,1} = neuron_arr{n,1}.update_vars(v_t_minus_1, u_t_minus_1, i, ti, tau, tau_re, tau_ei, tau_ir);
         else
             i = 2*synaptic_weights(1,2)*neuron_arr{1,1}.xe(ti) + 10*thalamus_neurons{2,1}.xe(ti) + -1*inhibitory_neuron.xe(ti);
             v_t_minus_1 = neuron_arr{n,1}.voltage(ti-1);
             u_t_minus_1 = neuron_arr{n,1}.feedback_var(ti-1);
     
-            neuron_arr{n,1} = neuron_arr{n,1}.update_vars(v_t_minus_1, u_t_minus_1, i, ti, tau);
+            neuron_arr{n,1} = neuron_arr{n,1}.update_vars(v_t_minus_1, u_t_minus_1, i, ti, tau, tau_re, tau_ei, tau_ir);
         end
     end
 
